@@ -42,6 +42,11 @@ spring:
         dispatchOrder-in-0:
           destination: order-dispatched
           group: ${spring.application.name}
+          consumer:
+            max-attempts: 3  # Maximum number of retry attempts
+            back-off-initial-interval: 1000 # 1s
+            back-off-max-interval: 10000 # 10s
+            back-off-multiplier: 2
         acceptOrder-out-0:
           destination: order-accepted
       rabbit:
@@ -55,6 +60,11 @@ spring:
     username: admin
     password: 123456
     connection-timeout: 5s
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/PolarBookshop
 
 polar:
   catalog-service-uri: "http://localhost:9001"

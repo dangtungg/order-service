@@ -18,6 +18,7 @@ public class OrderFunctions {
     public Consumer<Flux<OrderDispatchedMessage>> dispatchOrder(OrderService orderService) {
         return flux -> orderService.consumeOrderDispatchedEvent(flux)
                 .doOnNext(order -> log.info("The order with id {} is dispatched", order.id()))
+                .doOnError(error -> log.error("Failed to dispatch order", error))
                 .subscribe();
     }
 

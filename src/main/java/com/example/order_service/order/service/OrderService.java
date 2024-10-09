@@ -24,22 +24,15 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final StreamBridge streamBridge;
 
-    public OrderService(BookClient bookClient,
-                        OrderRepository orderRepository,
-                        StreamBridge streamBridge) {
+    public OrderService(BookClient bookClient, StreamBridge streamBridge, OrderRepository orderRepository) {
         this.bookClient = bookClient;
         this.orderRepository = orderRepository;
         this.streamBridge = streamBridge;
     }
 
-    public Flux<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public Flux<Order> getAllOrders(String userId) {
+        return orderRepository.findAllByCreatedBy(userId);
     }
-
-    /*public Mono<Order> submitOrder(String isbn, int quantity) {
-        return Mono.just(buildRejectedOrder(isbn, quantity))
-                .flatMap(orderRepository::save);
-    }*/
 
     @Transactional
     public Mono<Order> submitOrder(String isbn, int quantity) {
@@ -86,9 +79,10 @@ public class OrderService {
                 OrderStatus.DISPATCHED,
                 existingOrder.createdDate(),
                 existingOrder.lastModifiedDate(),
+                existingOrder.createdBy(),
+                existingOrder.lastModifiedBy(),
                 existingOrder.version()
         );
     }
-
 
 }
